@@ -1,0 +1,122 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 13.04.2 ] */
+
+/* [wxMaxima: comment start ]
+A wxMaxmima implementation of a simple DSA.
+
+Written by Patrick Hieber
+License: GNU GPL v2.0
+
+According to page 22
+ISBN: 987-3-658-06543-0
+Prof. Dr. Jörg Schwenk
+
+p => Modulus
+q => Teiler von p-1
+g => Generator der Untergruppe mit Ordnung q
+y => Public Key
+h_m => Hash der Nachricht m
+r => Zufallswert
+x => geheimer Schlüssel
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+p:227; q:113; g:3; y:87; h_m:10; x:11;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 1: Wähle eine geheime, zufällige Zahl r, 0 <= r < q
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+r:6;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 2: Berechne k
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+k:mod(mod(g^r, p), q);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 3: Berechne Inverses von r (hier mit Satz von Euler, gdw. r coprime q)
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+if gcd(r, q) = 1 then
+    r_inverse: mod(r^(q-2),q);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 4: Berechne s
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+s: mod(r_inverse * (h_m + x*k), q);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 5: Gebe die Signatur (k,s) aus
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+k; s;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+====================
+Verifikation:
+
+Schritt 1: Verwende öffentlichen Schlüssel (p,q,g,y)
+Schritt 2: Überprüfe ob 0 <= k < q und 0 <= s < q Wenn nicht (d.h. hier nicht True), so ist die Signatur fehlerhaft
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+if ( is(0<=k) and is(k<q) and is(0<=s) and is(s<q) ) then
+    True;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 3: Berechne w (hier mit Satz von Euler, gdw. s coprime q)
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+if gcd(s, q) = 1 then
+    s_inverse: mod(s^(q-2),q);
+    w: mod(s_inverse, q);
+    h_m;
+else
+    False;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 4: Berechne u_1 und u_2
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+u_1: mod( w*h_m, q);
+u_2: mod( k*w, q);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 5: Berechne v
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+v: mod( mod(g^u_1 * y^u_2, p), q);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Schritt 6: Prüfe ob v == k, falls ja, Signatur gültig
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+v; k;
+if v=k then
+    True;
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
